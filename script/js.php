@@ -2,7 +2,6 @@
 
 require("../include/color.php");
 require("../include/packer.php");
-
 ob_start("packer");
 
 function packer($str) {
@@ -243,6 +242,7 @@ function displayUser() {
 					<li><a href="#team">Meet The Team</a></li>
 					<li><a href="#log">Changelog</a></li>
 					<li><a href="#color">Color List</a></li>
+					<li><a href="#chatlog">Chatlog</a></li>
 				</ul>
 				<div id="chat">
 					<div id="message" class="content"></div>
@@ -271,10 +271,19 @@ function displayUser() {
 					<br />
 					<span style="font-weight: bold; font-size: 1.24em">Ganonmaster - iPhone Dev</span><br />
 					<span>Bringing the pain to your phone, so you can click on the go. </span><br />
+					<br />
+					<span style="font-weight: bold; font-size: 1.24em">Fleppensteyn - Random Dev</span><br />
+					<span>I can haz text about me?</span><br />
 				</div>
 				<div id="log" class="content">
 					<h2>Changelog</h2>
 					<h3>1.1</h3>
+					<b>1.4</b>
+					<ul>
+						<li>Added the chatlog in separate tab and on a separate page</li>
+						<li>Hyperlinks become clickable when posted in chat</li>
+						<li>Modified stats page to include fails</li>
+					</ul>
 					<b>1.3</b>
 					<ul>
 						<li>Back-End changes to support admins screwing with clickcounts without loss of true click count.</li>
@@ -314,6 +323,17 @@ function displayUser() {
 						<li>Made website links open in a new window</li>
 					</ul>
 				</div>
+				<div id="chatlog">
+					<div id="logctrl">
+						<span class="info">no log</span><br/>
+						<a href="javascript:loadLog(-1)">Previous</a>
+						<span><input type="text" class="pid" value="1" size="5"/>
+						<a href="javascript:loadLog(0)">GO!</a></span>
+						<a href="javascript:loadLog(1)">Next</a>
+						<a href="chatlog.php" target="_blank">Seperate Chatlog</a>
+					</div>
+					<div id="logdata" class="content"></div>
+				</div>
 EOF;
 			echo str_replace(array("'","\r","\n","\t"),array("\'",''),$echo); 
 			$str = "<div id='color'>";
@@ -332,7 +352,8 @@ EOF;
 			
 			click.fail = 0;
 			sendmes.scroll = true;
-		
+			loadLog(0);
+			$('.pid').keyup(function(event) {if(event.keyCode=='13') {loadLog(0);}});
 			$('.messend').mouseup(sendmes);
 			$('.mes').keyup(function(event) {if(event.keyCode=='13') {sendmes();}});
 }
@@ -360,6 +381,22 @@ function sendmes() {
 					}
 				}).html('Message Failed to Send. Try again?').dialog("open");
 		}
+	});
+}
+var pid=0;
+function loadLog(a) {
+	if (a!=0){
+		pid=this.pid+a;
+	} else{
+		pid=$(".pid").val()-1;
+	}
+	$.post("chatlog.php?getlog",{ pgid : pid },function(data) {
+		var arg = $.parseJSON(data);
+		pid=arg.pid;
+		$(".info").html("Showing page: "+(arg.pid+1)+" of "+(arg.pages+1)+" | line nr: "+(arg.pid*20)+" to "+((arg.pid+1)*20)+" of "+(arg.lines)+" lines");
+		$(".pid").val(arg.pid+1);
+		$("#logdata").html(arg.log);
+		return;
 	});
 }
 function loadUser() {
