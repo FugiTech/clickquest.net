@@ -99,11 +99,21 @@ span {
 	height: 520px;
 	float: left;
 }
+#logctrl{
+	border: 1px solid gray;
+	color: white;
+	z-index:9999;
+}
+#logctrl a,#logctrl span{
+	padding-left:1em;
+	padding-right:2em;
+}
+
 .content { overflow: auto; height: 450px; }
-#message { height: 400px; }
+#message, #logdata { height: 400px; }
 .chatline { display: block; }
 #right { font-size: 1em; }
-.mes, .messend {
+.mes, .messend , .cpg,.pid{
 	background: black;
 	border: 1px solid gray;
 	color: white;

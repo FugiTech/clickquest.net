@@ -93,7 +93,6 @@ class User
 		
 		if($this->banned) { $this->logout(); return array("success"=>True, "error"=>"User is Banned"); }
 		if($this->ip != $temp['ip']) { $this->db->query('UPDATE users SET ip="'.$this->db->real_escape_string($this->ip).'" WHERE id="'.($this->id).'"'); }
-		
 		return array("success"=>True, "error"=>"None");
 	}
 	function logout() {
@@ -140,7 +139,7 @@ class User
 	function getLevel() { return $this->level; }
 	function getIP() { return $this->ip; }
 	function getColor() { return $this->color->getHex(); }
-	function getAction() { return $this->action[0]; }
+	function getAction() { if (isset($this->action[0])){return $this->action[0];} else {return null;}}
 	function getStart() { return $this->start; }
 	function getTotalTime() { return $this->total; }
 	function isAdmin() { return ($this->admin ? True : False); }
@@ -190,32 +189,63 @@ class User
 		$result->close();
 		return $return;
 	}
+	static function getChatPage($pid){
+		$db = self::connect();
+		$return='';
+		$r= $db->query('SELECT COUNT(*) FROM chat');
+		$lines=$r->fetch_row();
+		$r->close();
+		$lines=(int) $lines[0];
+		$pages=round(($lines-11)/20);
+		if($pid<0 || !is_int($pid)){
+			$pid=0;
+		} elseif($pid>$pages){
+			$pid=$pages;
+		}
+		$start=$pid*20;
+		$result= $db->query("SELECT * FROM chat ORDER BY id ASC LIMIT $start , 20");
+		if($result===False) return $db->error;
+		while($chatline = $result->fetch_assoc()) {
+			if(empty($chatline['name']) || trim($chatline['name']) == '>') {
+				$name = $chatline['name'];
+			} else {
+				$name = date('H:i:s ',$chatline['time']).$chatline['name'].'['.$chatline['level'].']: ';
+			}
+			$return = $return."<span class='chatline' style='color: #".($chatline['level'] > 99 ? '000000; text-shadow: #FFFFFF 0px 0px 3px' : $chatline['color']).";'>".$name.$chatline['message']."</span>";
+		}
+		$result->close();
+		return array("log"=>$return, "pid"=>$pid, "pages"=>$pages, "lines"=>$lines);
+	}
 	function getStats() {
-		$result	= self::arrayQuery('SELECT count(id) as user, sum(clicks+modified) as total, sum(level) as level FROM users WHERE banned=0');
-		$r = $this->db->query("CREATE TEMPORARY TABLE leaderboard ( `rank` INT NOT NULL AUTO_INCREMENT, `username` VARCHAR( 16 ) NOT NULL, `level` INT NOT NULL DEFAULT '0', `clicks` INT NOT NULL DEFAULT '0', `color` CHAR(6) NOT NULL, `lrr` TINYINT NOT NULL DEFAULT '0', PRIMARY KEY ( `rank` )) ENGINE=MEMORY;");
+		$result	= self::arrayQuery('SELECT count(id) as user, sum(clicks+modified) as total, sum(level) as level, sum(fail) as fail FROM users WHERE banned=0');
+		$r = $this->db->query("CREATE TEMPORARY TABLE leaderboard ( `rank` INT NOT NULL AUTO_INCREMENT, `username` VARCHAR( 16 ) NOT NULL, `level` INT NOT NULL DEFAULT '0', `clicks` INT NOT NULL DEFAULT '0', `color` CHAR(6) NOT NULL, `lrr` TINYINT NOT NULL DEFAULT '0',`fail` INT NOT NULL DEFAULT '0', PRIMARY KEY ( `rank` )) ENGINE=MEMORY;");
 		if($r === False)
 			logDebug("FAILED TO CREATE TABLE");
-		$r = $this->db->query("INSERT INTO leaderboard (username, level, clicks, color, lrr) SELECT username, level, (clicks+modified), color, lrr FROM users WHERE banned = 0 ORDER BY (clicks+modified) DESC;");
+		$r = $this->db->query("INSERT INTO leaderboard (username, level, clicks, color, lrr, fail) SELECT username, level, (clicks+modified), color, lrr, fail FROM users WHERE banned = 0 ORDER BY (clicks+modified) DESC;");
 		if($r === False)
 			logDebug("FAILED TO POPULATE TABLE");
-		$big = self::fullQuery("SELECT rank, username, clicks, level, color FROM leaderboard WHERE rank <= 10 OR lrr = 1 OR username='".$this->name."';",$this->db);
+		$big = self::fullQuery("SELECT rank, username, clicks, level, color, fail FROM leaderboard WHERE rank <= 10 OR lrr = 1 OR username='".$this->name."';",$this->db);
 		$r = $this->db->query("DROP TABLE leaderboard");
 		if($r === False)
 			logDebug("FAILED TO RELEASE TABLE");
 		$stat = array(
 			'user' => number_format($result['user']),
 			'total' => number_format($result['total']),
+			'fails' => number_format($result['fail']*-1),
 			'avg' => number_format($result['total']/$result['user'],2),
 			'level' => number_format($result['level']/$result['user'],2),
+			'fail' => number_format(($result['fail']*-1)/$result['user'],2)
 		);
 		$return = "<p>Users: ".$stat['user']."<br />\n".
 					"Total Clicks: ".$stat['total']."<br />\n".
+					"Total Fails: ".$stat['fails']."<br />\n".
 					"Average Clicks: ".$stat['avg']."<br />\n".
-					"Average Level: ".$stat['level']."<br />\n<br />\n";
+					"Average Level: ".$stat['level']."<br />\n".
+					"Average Fail: ".$stat['fail']."<br />\n<br />\n";
 	foreach($big as $row){
 		$return .= '<span style="color: #'.$row['color'].';">';
 		$return .= '#'.$row['rank'].': ';
-		$return .= $row['username'].' at '.number_format($row['clicks']).' clicks [Level '.$row['level'].']';
+		$return .= $row['username'].' at '.number_format($row['clicks']).' clicks [Level '.$row['level'].']&lt;'.($row['fail']*-1).' Fails&gt;';
 		$return .= '</span><br />'."\n";
 	}
 		$return .= <<<STATS
@@ -305,7 +335,7 @@ STATS;
 		} else {
 			$name = $this->name;
 		}
-		return $this->db->query("INSERT INTO chat(userid, name, message, color, level, ip, time) VALUES ('".$this->id."', '".$name."', '".$this->db->real_escape_string(($this->admin ? $mes : htmlspecialchars($mes)) )."', '".$this->color->getHex()."', '".$this->level."', '".$this->ip."', '".time()."')");
+		return $this->db->query("INSERT INTO chat(userid, name, message, color, level, ip, time) VALUES ('".$this->id."', '".$name."', '".$this->db->real_escape_string(preg_replace('(\bhttp://[^ ]+\b)', '<a href="$0" target="_blank">$0</a>', ($this->admin ? $mes : htmlspecialchars($mes))))."', '".$this->color->getHex()."', '".$this->level."', '".$this->ip."', '".time()."')");
 	}
 	function setColor($code) {
 		$temp = new Color($code);

@@ -50,6 +50,10 @@ if(isset($_GET['isLoggedIn'])) {
 		echo json_encode(array(
 			"stats" => $USER->getStats()
 		)/* , JSON_FORCE_OBJECT */);
+} elseif(isset($_GET['getChatLog'])) {
+		echo json_encode(
+			$USER::getChatPage((int)$_POST['pgid'])
+		/* , JSON_FORCE_OBJECT */);		
 		
 		
 /*
