@@ -200,7 +200,7 @@ class User
 		if($results<1 || !is_int($results)){
 			$results=20;
 		}
-		$pages=round(($lines+(($results/2)-1))/$results);
+		$pages=ceil($lines/$results);
 		if($pid<1 || !is_int($pid)){
 			$pid=1;
 		} elseif($pid>$pages){
