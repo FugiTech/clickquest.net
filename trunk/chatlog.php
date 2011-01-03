@@ -93,7 +93,7 @@ span {
 			$.post("api.php?getChatLog",{ pgid : loadLog.pid , res : results  },function(data) {
 				var arg = $.parseJSON(data);
 				loadLog.pid=arg.pid;
-				$(".info").html("Showing page: "+(arg.pid)+" of "+(arg.pages)+" | line nr: "+(((arg.pid-1)*arg.results)+1)+" to "+(arg.pid*arg.results)+" of "+(arg.lines+1)+" lines");
+				$(".info").html("Showing page: "+(arg.pid)+" of "+(arg.pages)+" | line nr: "+(((arg.pid-1)*arg.results)+1)+" to "+(arg.pid*arg.results)+" of "+(arg.lines)+" lines");
 				$(".pid").val(arg.pid);
 				$("#log").html(arg.log);
 				$('.res').val(arg.results);
@@ -105,7 +105,7 @@ span {
 	</head>
 	<body>
 	<div id="logctrl">
-		<span class="info"><?php echo "Showing page: ".$r['pid']." of ".$r['pages']." | line nr: ".((($r['pid']-1)*$r['results'])+1)." to ".($r['pid']*$r['results'])." of ".($r['lines']+1)." lines"; ?></span><br/>
+		<span class="info"><?php echo "Showing page: ".$r['pid']." of ".$r['pages']." | line nr: ".((($r['pid']-1)*$r['results'])+1)." to ".($r['pid']*$r['results'])." of ".($r['lines'])." lines"; ?></span><br/>
 		<form action="chatlog.php" id="form">
 		<a id="prev" href="<?php echo "chatlog.php?page=".($r['pid']-1)."&results=".($r['results']); ?>">Previous</a>
 		<input type="text" class="pid" name="page" value="<?php echo $r['pid']; ?>" size="5"/>
