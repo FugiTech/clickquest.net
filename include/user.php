@@ -193,14 +193,14 @@ class User
 	static function getChatPage($pid,$results){
 		$db = self::connect();
 		$return='';
-		$r= $db->query('SELECT COUNT(id) FROM chat WHERE id>=0');
+		$r= $db->query('SELECT COUNT(id) FROM chat');
 		$lines=$r->fetch_row();
 		$r->close();
 		$lines=(int) $lines[0];
 		if($results<1 || !is_int($results)){
 			$results=20;
 		}
-		$pages=round(($lines+($results/2))/$results);
+		$pages=round(($lines+(($results/2)-1))/$results);
 		if($pid<1 || !is_int($pid)){
 			$pid=1;
 		} elseif($pid>$pages){

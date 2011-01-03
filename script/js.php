@@ -409,7 +409,7 @@ function loadLog() {
 	$.post("api.php?getChatLog",{ pgid : loadLog.pid , res : 20  },function(data) {
 		var arg = $.parseJSON(data);
 		loadLog.pid=arg.pid;
-		$(".info").html("Showing page: "+(arg.pid)+" of "+(arg.pages)+" | line nr: "+(((arg.pid-1)*arg.results)+1)+" to "+(arg.pid*arg.results)+" of "+(arg.lines+1)+" lines");
+		$(".info").html("Showing page: "+(arg.pid)+" of "+(arg.pages)+" | line nr: "+(((arg.pid-1)*arg.results)+1)+" to "+(arg.pid*arg.results)+" of "+(arg.lines)+" lines");
 		$(".pid").val(arg.pid);
 		$("#logdata").html(arg.log);
 		return;
