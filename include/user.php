@@ -93,6 +93,7 @@ class User
 		
 		if($this->banned) { $this->logout(); return array("success"=>True, "error"=>"User is Banned"); }
 		if($this->ip != $temp['ip']) { $this->db->query('UPDATE users SET ip="'.$this->db->real_escape_string($this->ip).'" WHERE id="'.($this->id).'"'); }
+		
 		return array("success"=>True, "error"=>"None");
 	}
 	function logout() {
@@ -189,21 +190,24 @@ class User
 		$result->close();
 		return $return;
 	}
-	static function getChatPage($pid){
+	static function getChatPage($pid,$results){
 		$db = self::connect();
 		$return='';
-		$r= $db->query('SELECT COUNT(*) FROM chat');
+		$r= $db->query('SELECT COUNT(id) FROM chat WHERE id>=0');
 		$lines=$r->fetch_row();
 		$r->close();
 		$lines=(int) $lines[0];
-		$pages=round(($lines-11)/20);
-		if($pid<0 || !is_int($pid)){
-			$pid=0;
+		if($results<1 || !is_int($results)){
+			$results=20;
+		}
+		$pages=round(($lines-(($results/2)))/$results)+1;
+		if($pid<1 || !is_int($pid)){
+			$pid=1;
 		} elseif($pid>$pages){
 			$pid=$pages;
 		}
-		$start=$pid*20;
-		$result= $db->query("SELECT * FROM chat ORDER BY id ASC LIMIT $start , 20");
+		$start=($pid-1)*$results;
+		$result= $db->query("SELECT * FROM chat ORDER BY id ASC LIMIT $start , $results");
 		if($result===False) return $db->error;
 		while($chatline = $result->fetch_assoc()) {
 			if(empty($chatline['name']) || trim($chatline['name']) == '>') {
@@ -214,7 +218,7 @@ class User
 			$return = $return."<span class='chatline' style='color: #".($chatline['level'] > 99 ? '000000; text-shadow: #FFFFFF 0px 0px 3px' : $chatline['color']).";'>".$name.$chatline['message']."</span>";
 		}
 		$result->close();
-		return array("log"=>$return, "pid"=>$pid, "pages"=>$pages, "lines"=>$lines);
+		return array("log"=>$return, "pid"=>$pid, "pages"=>$pages, "lines"=>$lines, "results"=>$results);
 	}
 	function getStats() {
 		$result	= self::arrayQuery('SELECT count(id) as user, sum(clicks+modified) as total, sum(level) as level, sum(fail) as fail FROM users WHERE banned=0');
@@ -612,7 +616,7 @@ STATS;
 		global $CONFIG;
 		
 		$db = new mysqli($CONFIG['sql_host'],$CONFIG['sql_user'],$CONFIG['sql_pass'],$CONFIG['sql_db']);
-		if($mysqli->connect_error) {
+		if($db->connect_error) {
 			logError('Connect Error ('.$mysqli->connect_errno.') '.$mysqli->connect_error);
 		}
 		return $db;

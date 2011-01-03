@@ -2,6 +2,7 @@
 
 require("../include/color.php");
 require("../include/packer.php");
+
 ob_start("packer");
 
 function packer($str) {
@@ -326,10 +327,10 @@ function displayUser() {
 				<div id="chatlog">
 					<div id="logctrl">
 						<span class="info">no log</span><br/>
-						<a href="javascript:loadLog(-1)">Previous</a>
-						<span><input type="text" class="pid" value="1" size="5"/>
-						<a href="javascript:loadLog(0)">GO!</a></span>
-						<a href="javascript:loadLog(1)">Next</a>
+						<input type="button" id="prevlog" value="Previous"/>
+						<input type="text" class="pid" value="1" size="5"/>
+						<input type="button" id="golog" value="Go"/>
+						<input type="button" id="nextlog" value="Next"/>
 						<a href="chatlog.php" target="_blank">Seperate Chatlog</a>
 					</div>
 					<div id="logdata" class="content"></div>
@@ -352,8 +353,29 @@ EOF;
 			
 			click.fail = 0;
 			sendmes.scroll = true;
-			loadLog(0);
-			$('.pid').keyup(function(event) {if(event.keyCode=='13') {loadLog(0);}});
+			loadLog();
+			$('#golog').click(function(event){
+				if (loadLog.pid==$(".pid").val()){
+					return;
+				} else{
+					loadLog.pid=$(".pid").val();
+					loadLog();
+				}
+			});
+			$('#prevlog').click(function(event){
+				loadLog.pid--;
+				loadLog();
+			});
+			$('#nextlog').click(function(event){
+				loadLog.pid++;
+				loadLog();
+			});
+			$('.pid').keyup(function(event) {
+				if(event.keyCode=='13') {
+					loadLog.pid=$(".pid").val();
+					loadLog();
+				}
+			});
 			$('.messend').mouseup(sendmes);
 			$('.mes').keyup(function(event) {if(event.keyCode=='13') {sendmes();}});
 }
@@ -383,18 +405,12 @@ function sendmes() {
 		}
 	});
 }
-var pid=0;
-function loadLog(a) {
-	if (a!=0){
-		pid=this.pid+a;
-	} else{
-		pid=$(".pid").val()-1;
-	}
-	$.post("chatlog.php?getlog",{ pgid : pid },function(data) {
+function loadLog() {
+	$.post("api.php?getChatLog",{ pgid : loadLog.pid , res : 20  },function(data) {
 		var arg = $.parseJSON(data);
-		pid=arg.pid;
-		$(".info").html("Showing page: "+(arg.pid+1)+" of "+(arg.pages+1)+" | line nr: "+(arg.pid*20)+" to "+((arg.pid+1)*20)+" of "+(arg.lines)+" lines");
-		$(".pid").val(arg.pid+1);
+		loadLog.pid=arg.pid;
+		$(".info").html("Showing page: "+(arg.pid)+" of "+(arg.pages)+" | line nr: "+((arg.pid-1)*arg.results)+" to "+(arg.pid*arg.results)+" of "+(arg.lines)+" lines");
+		$(".pid").val(arg.pid);
 		$("#logdata").html(arg.log);
 		return;
 	});
@@ -409,6 +425,8 @@ function loadUser() {
 		heartbeat.color = data.color;
 		heartbeat.user = data.user;
 		heartbeat.murmur = true;
+		
+		loadLog.pid=0;
 		
 		login.session = 0;
 		login.total = 1*data.totalTime;
