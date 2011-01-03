@@ -1,40 +1,17 @@
 ﻿<?php
-require_once("../config.php");
-date_default_timezone_set('America/New_York');
-function getChatPage($pid,$results){
-	global $CONFIG;
-	$db = new mysqli($CONFIG['sql_host'],$CONFIG['sql_user'],$CONFIG['sql_pass'],$CONFIG['sql_db']);
-	$return='';
-	$r= $db->query('SELECT COUNT(*) FROM chat WHERE id >= 0');
-	$lines=$r->fetch_row();
-	$r->close();
-	$lines=(int) $lines[0];
-	if($results<1 || !is_int($results)){
-		$results=20;
-	}
-	$pages=round(($lines-(($results/2)+1))/$results);
-	if($pid<0 || !is_int($pid)){
-		$pid=0;
-	} elseif($pid>$pages){
-		$pid=$pages;
-	}
-	$start=$pid*$results;
-	$result= $db->query("SELECT * FROM chat ORDER BY id ASC LIMIT $start , $results");
-	if($result===False) return $db->error;
-	while($chatline = $result->fetch_assoc()) {
-		if(empty($chatline['name']) || trim($chatline['name']) == '>') {
-			$name = $chatline['name'];
-		} else {
-			$name = date('H:i:s ',$chatline['time']).$chatline['name'].'['.$chatline['level'].']: ';
-		}
-		$return = $return."<span class='chatline' style='color: #".($chatline['level'] > 99 ? '000000; text-shadow: #FFFFFF 0px 0px 3px' : $chatline['color']).";'>".$name.$chatline['message']."</span>";
-	}
-	$result->close();
-	return array("log"=>$return, "pid"=>$pid, "pages"=>$pages, "lines"=>$lines, "results"=>$results);
+require_once("include/core.php");
+if(isset($_REQUEST['page'])&&(int)$_REQUEST['page']>0){
+	$page=(int)$_REQUEST['page'];
+}else{
+	$page=1;
 }
-if (isset($_GET['getlog'])){
-	echo json_encode(getChatPage((int)$_POST['pgid'],(int)$_POST['res']));
-} else{?>
+if(isset($_REQUEST['results'])&&(int)$_REQUEST['results']>0){
+	$results=(int)$_REQUEST['results'];
+}else{
+	$results=20;
+}
+$r=$USER::getChatPage($page,$results);
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">	<html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>CLICKQUEST Chatlog Browser</title>
@@ -81,39 +58,61 @@ span {
 		<script type="text/javascript" src="script/cycle.js"></script>
 		<script type="text/javascript" src="script/extend.js"></script> 
 		<script type="text/javascript">
-		var pid=0;
-		function loadLog(a) {
-			if (a==0){
-				pid=$(".pid").val()-1;
-			} else{
-				pid=pid+a;
-			}
+		$(document).ready(function() {	
+			loadLog.pid=<?php echo $page; ?>;
+			$('#next').attr( 'href', '#' );
+			$('#prev').attr( 'href', '#' );
+			$('#next').click(function(event){
+				loadLog.pid++;
+				loadLog();
+			});
+			$('#go').replaceWith('<a id="go" href="#">GO!</a>');
+			$('#go').click(function(event){
+				if (loadLog.pid==$(".pid").val()){
+					return;
+				} else{
+					loadLog.pid=$(".pid").val();
+					loadLog();
+				}
+			});
+			$('#prev').click(function(event){
+				loadLog.pid--;
+				loadLog();
+			});
+			$('.inp').keyup(function(event) {
+				if(event.keyCode=='13') {
+					loadLog.pid=$(".pid").val();
+					loadLog();
+				}
+			});
+		});
+		function loadLog() {
 			var results=$(".res").val();
-			$('.pid').keyup(function(event) {if(event.keyCode=='13') {loadLog(0);}});
-			$('.res').keyup(function(event) {if(event.keyCode=='13') {loadLog(0);}});
-			$.post("chatlog.php?getlog",{ pgid : pid , res : results  },function(data) {
+			$.post("api.php?getChatLog",{ pgid : loadLog.pid , res : results  },function(data) {
 				var arg = $.parseJSON(data);
-				pid=arg.pid;
-				$(".info").html("Showing page: "+(arg.pid+1)+" of "+(arg.pages+1)+" | line nr: "+(arg.pid*arg.results)+" to "+((arg.pid+1)*arg.results)+" of "+(arg.lines)+" lines");
-				$(".pid").val(arg.pid+1);
+				loadLog.pid=arg.pid;
+				$(".info").html("Showing page: "+(arg.pid)+" of "+(arg.pages)+" | line nr: "+((arg.pid-1)*arg.results)+" to "+(arg.pid*arg.results)+" of "+(arg.lines)+" lines");
+				$(".pid").val(arg.pid);
 				$("#log").html(arg.log);
 				$('.res').val(arg.results);
 				return;
 			});
 		}
-		loadLog(0);
+
 		</script>
 	</head>
 	<body>
 	<div id="logctrl">
-		<span class="info">no log</span><br/>
-		<a href="javascript:loadLog(-1)">Previous</a>
-		<input type="text" class="pid" value="1" size="5"/>
-		<a href="javascript:loadLog(0)">GO!</a>
-		<a href="javascript:loadLog(1)">Next</a>
-		Results per page: <input type="text" class="res" value="20" size="3"/>
+		<span class="info"><?php echo "Showing page: ".$r['pid']." of ".$r['pages']." | line nr: ".(($r['pid']-1)*$r['results'])." to ".($r['pid']*$r['results'])." of ".$r['lines']." lines"; ?></span><br/>
+		<form action="chatlog.php">
+		<a id="prev" href="<?php echo "chatlog.php?page=".($r['pid']-1)."&results=".($r['results']); ?>">Previous</a>
+		<input type="text" class="pid" name="page" value="<?php echo $r['pid']; ?>" size="5"/>
+		<input type="submit" id="go" value="GO!"/>
+		<a id="next" href="<?php echo "chatlog.php?page=".($r['pid']+1)."&results=".($r['results']); ?>">Next</a>
+		Results per page: <input type="text" class="res" name="results" value="<?php echo $r['results']; ?>" size="3"/>
+		</form>
 	</div>
-	<div id="log">
+	<div id="log"><?php echo $r['log'];?>
 	</div>
 	</body>
-</html><?php } ?>
+</html>

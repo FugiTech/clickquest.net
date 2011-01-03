@@ -104,16 +104,16 @@ span {
 	color: white;
 	z-index:9999;
 }
-#logctrl a,#logctrl span{
-	padding-left:1em;
-	padding-right:2em;
+#logctrl *{
+	margin-left:0.5em;
+	margin-right:0.5em;
 }
 
 .content { overflow: auto; height: 450px; }
 #message, #logdata { height: 400px; }
 .chatline { display: block; }
 #right { font-size: 1em; }
-.mes, .messend , .cpg,.pid{
+.mes, .messend , #logctrl input{
 	background: black;
 	border: 1px solid gray;
 	color: white;
