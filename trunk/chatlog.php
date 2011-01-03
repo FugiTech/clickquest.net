@@ -60,13 +60,14 @@ span {
 		<script type="text/javascript">
 		$(document).ready(function() {	
 			loadLog.pid=<?php echo $page; ?>;
-			$('#next').attr( 'href', '#' );
-			$('#prev').attr( 'href', '#' );
 			$('#next').click(function(event){
+				event.preventDefault();
 				loadLog.pid++;
 				loadLog();
 			});
-			$('#go').replaceWith('<a id="go" href="#">GO!</a>');
+			$('#form').submit(function(event) {
+				event.preventDefault();
+			});
 			$('#go').click(function(event){
 				if (loadLog.pid==$(".pid").val()){
 					return;
@@ -76,6 +77,7 @@ span {
 				}
 			});
 			$('#prev').click(function(event){
+				event.preventDefault();
 				loadLog.pid--;
 				loadLog();
 			});
@@ -91,7 +93,7 @@ span {
 			$.post("api.php?getChatLog",{ pgid : loadLog.pid , res : results  },function(data) {
 				var arg = $.parseJSON(data);
 				loadLog.pid=arg.pid;
-				$(".info").html("Showing page: "+(arg.pid)+" of "+(arg.pages)+" | line nr: "+((arg.pid-1)*arg.results)+" to "+(arg.pid*arg.results)+" of "+(arg.lines)+" lines");
+				$(".info").html("Showing page: "+(arg.pid)+" of "+(arg.pages)+" | line nr: "+(((arg.pid-1)*arg.results)+1)+" to "+(arg.pid*arg.results)+" of "+(arg.lines+1)+" lines");
 				$(".pid").val(arg.pid);
 				$("#log").html(arg.log);
 				$('.res').val(arg.results);
@@ -103,8 +105,8 @@ span {
 	</head>
 	<body>
 	<div id="logctrl">
-		<span class="info"><?php echo "Showing page: ".$r['pid']." of ".$r['pages']." | line nr: ".(($r['pid']-1)*$r['results'])." to ".($r['pid']*$r['results'])." of ".$r['lines']." lines"; ?></span><br/>
-		<form action="chatlog.php">
+		<span class="info"><?php echo "Showing page: ".$r['pid']." of ".$r['pages']." | line nr: ".((($r['pid']-1)*$r['results'])+1)." to ".($r['pid']*$r['results'])." of ".($r['lines']+1)." lines"; ?></span><br/>
+		<form action="chatlog.php" id="form">
 		<a id="prev" href="<?php echo "chatlog.php?page=".($r['pid']-1)."&results=".($r['results']); ?>">Previous</a>
 		<input type="text" class="pid" name="page" value="<?php echo $r['pid']; ?>" size="5"/>
 		<input type="submit" id="go" value="GO!"/>

@@ -200,7 +200,7 @@ class User
 		if($results<1 || !is_int($results)){
 			$results=20;
 		}
-		$pages=round(($lines-(($results/2)))/$results)+1;
+		$pages=round(($lines+($results/2))/$results);
 		if($pid<1 || !is_int($pid)){
 			$pid=1;
 		} elseif($pid>$pages){
@@ -617,7 +617,7 @@ STATS;
 		
 		$db = new mysqli($CONFIG['sql_host'],$CONFIG['sql_user'],$CONFIG['sql_pass'],$CONFIG['sql_db']);
 		if($db->connect_error) {
-			logError('Connect Error ('.$mysqli->connect_errno.') '.$mysqli->connect_error);
+			logError('Connect Error ('.$db->connect_errno.') '.$db->connect_error);
 		}
 		return $db;
 	}
