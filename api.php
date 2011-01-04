@@ -52,7 +52,7 @@ if(isset($_GET['isLoggedIn'])) {
 		)/* , JSON_FORCE_OBJECT */);
 } elseif(isset($_GET['getChatLog'])) {
 		echo json_encode(
-			$USER::getChatPage((int)$_POST['pgid'],(int)$_POST['res'])
+			USER::getChatPage((int)$_POST['pgid'],(int)$_POST['res'])
 		/* , JSON_FORCE_OBJECT */);		
 		
 		
