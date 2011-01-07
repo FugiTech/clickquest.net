@@ -1,7 +1,10 @@
 <?php
 
 //IP Banned?
-$IP_BANNED = array('65.246.85.99');
+$IP_BANNED = array(
+	'65.246.85.99', //Don't remember who this is
+	'82.171.97.225' //Juffrow_Twiddel. He requested a temp ban for school concerns. (Unban on 1/20/11)
+);
 if(in_array(getIP(),$IP_BANNED)) die("Damn, you really pissed me off didn't you? Have a nice day elsewhere.");
 
 //Keep it smooth
