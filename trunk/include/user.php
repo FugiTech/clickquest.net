@@ -178,7 +178,7 @@ class User
 			} else {
 				$name = date('H:i:s ',$chatline['time']).$chatline['name'].'['.$chatline['level'].']: ';
 			}
-			$return = "<span class='chatline' style='color: #".($chatline['level'] > 99 ? '000000; text-shadow: #FFFFFF 0px 0px 3px' : $chatline['color']).";'>".$name.$chatline['message']."</span>".$return;
+			$return = "<span class='chatline' style='color: #".($chatline['level'] > 99 ? '000000; text-shadow: #'.$chatline['color'].' 0px 0px 3px; text-shadow: #'.$chatline['color'].' 0px 0px 3px; text-shadow: #'.$chatline['color'].' 0px 0px 3px' : $chatline['color']).";'>".$name.$chatline['message']."</span>".$return;
 		}
 		$result->close();
 		$result= $db->query("SELECT * FROM chat WHERE id < 0 ORDER BY id DESC LIMIT 100");
@@ -220,7 +220,7 @@ class User
 		$result->close();
 		return array("log"=>$return, "pid"=>$pid, "pages"=>$pages, "lines"=>$lines, "results"=>$results);
 	}
-	function getStats() {
+	function getStats($offset=2) {
 		$result	= self::arrayQuery('SELECT count(id) as user, sum(clicks+modified) as total, sum(level) as level, sum(fail) as fail FROM users WHERE banned=0');
 		$r = $this->db->query("CREATE TEMPORARY TABLE leaderboard ( `rank` INT NOT NULL AUTO_INCREMENT, `username` VARCHAR( 16 ) NOT NULL, `level` INT NOT NULL DEFAULT '0', `clicks` INT NOT NULL DEFAULT '0', `color` CHAR(6) NOT NULL, `lrr` TINYINT NOT NULL DEFAULT '0',`fail` INT NOT NULL DEFAULT '0', PRIMARY KEY ( `rank` )) ENGINE=MEMORY;");
 		if($r === False)
@@ -228,7 +228,8 @@ class User
 		$r = $this->db->query("INSERT INTO leaderboard (username, level, clicks, color, lrr, fail) SELECT username, level, (clicks+modified), color, lrr, fail FROM users WHERE banned = 0 ORDER BY (clicks+modified) DESC;");
 		if($r === False)
 			logDebug("FAILED TO POPULATE TABLE");
-		$big = self::fullQuery("SELECT rank, username, clicks, level, color, fail FROM leaderboard WHERE rank <= 10 OR lrr = 1 OR username='".$this->name."';",$this->db);
+		$rank = (int)self::arrayQuery("SELECT rank FROM leaderboard WHERE username='".$this->name."';",'rank',$this->db);
+		$big = self::fullQuery("SELECT rank, username, clicks, level, color, fail FROM leaderboard WHERE rank <= 10 OR lrr = 1 OR (".($rank-$offset)." <= rank AND rank <= ".($rank+$offset).");",$this->db);
 		$r = $this->db->query("DROP TABLE leaderboard");
 		if($r === False)
 			logDebug("FAILED TO RELEASE TABLE");
@@ -621,18 +622,20 @@ STATS;
 		}
 		return $db;
 	}
-	static function arrayQuery($sql,$column=null) {
-		$db = self::connect();
+	static function arrayQuery($sql,$column=null,$db=null) {
+		if(is_null($db)) {$close = true; $db = self::connect(); } else { $close = false; }
 		$result = $db->query($sql);
-		if($result === False)
+		if($result === False) {
+			logDebug("Query failed - ".$result->error);
 			return $result->error;
+		}
 		if($result->num_rows == 0) {
 			$result->close();
 			return False;
 		}
 		$array = $result->fetch_assoc();
 		$result->close();
-		$db->close();
+		if($close) $db->close();
 		if($column != null) {
 			return $array[$column];
 		} else {

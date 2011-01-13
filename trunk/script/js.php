@@ -279,6 +279,12 @@ function displayUser() {
 				<div id="log" class="content">
 					<h2>Changelog</h2>
 					<h3>1.1</h3>
+					<b>1.5</b>
+					<ul>
+						<li>Modified stats page to include people 2 ranks above or below you</li>
+						<li>Modified glow-text to be more glowy</li>
+						<li>Made a number bigger</li>
+					</ul>
 					<b>1.4</b>
 					<ul>
 						<li>Added the chatlog in separate tab and on a separate page</li>
