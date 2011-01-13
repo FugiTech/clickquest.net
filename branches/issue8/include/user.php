@@ -178,7 +178,7 @@ class User
 			} else {
 				$name = date('H:i:s ',$chatline['time']).$chatline['name'].'['.$chatline['level'].']: ';
 			}
-			$return = "<span class='chatline' style='color: #".($chatline['level'] > 99 ? '000000; text-shadow: #FFFFFF 0px 0px 3px' : $chatline['color']).";'>".$name.$chatline['message']."</span>".$return;
+			$return = "<span class='chatline' style='color: #".($chatline['level'] > 99 ? '000000; text-shadow: #'.$chatline['color'].' 0px 0px 3px; text-shadow: #'.$chatline['color'].' 0px 0px 3px; text-shadow: #'.$chatline['color'].' 0px 0px 3px' : $chatline['color']).";'>".$name.$chatline['message']."</span>".$return;
 		}
 		$result->close();
 		$result= $db->query("SELECT * FROM chat WHERE id < 0 ORDER BY id DESC LIMIT 100");
