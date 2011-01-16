@@ -240,7 +240,7 @@ function displayUser() {
 				<ul>
 					<li><a href="#chat">Chat</a></li>
 					<li><a href="#stats">Statistics</a></li>
-					<li><a href="#team">Meet The Team</a></li>
+					<li><a href="#llist">Level List</a></li>
 					<li><a href="#log">Changelog</a></li>
 					<li><a href="#color">Color List</a></li>
 					<li><a href="#chatlog">Chatlog</a></li>
@@ -254,31 +254,16 @@ function displayUser() {
 					</div>
 				</div>
 				<div id="stats" class="content"></div>
-				<div id="team" class="content">
-					<span style="font-weight: bold; font-size: 1.24em">Alex Steacy - Innovator, Man of Action, Emmisary of Awesome</span><br />
-					<span>Alex leads the team with a vision, a vision so horrendous and vile that it must be purified through the souls of 100 newborn kittens before it is passed down. Without him, ClickQuest would never had been born.</span><br />
-					<br />
-					<span style="font-weight: bold; font-size: 1.24em">Fugiman - Head Developer</span><br />
-					<span>Having written the initial two versions of ClickQuest, Fugi now relaxes at an unknown tropical island, sipping Coconut Rum with Coke while enjoying the comforts of many young nubile women.</span><br />
-					<br />
-					<span style="font-weight: bold; font-size: 1.24em">Nmaster64 - Server Administrator</span><br />
-					<span>Diety of Hardware, Nmaster controls the carcass of ClickQuest. His valiant efforts prevent your idiotic actions from preventing the whirring of the time-leeching machinery.</span><br />
-					<br />
-					<span style="font-weight: bold; font-size: 1.24em">Hagios - Security Analyst</span><br />
-					<span>Bugs? Injections? Cross Site Scripting? Pathetic. All shrivel before the gaze of Hagios. Think you know a way to get a quick click? Hagios was already there, and now you'll be banned for it. See you later.</span><br />
-					<br />
-					<span style="font-weight: bold; font-size: 1.24em">Invariel - Quality Control, Backup Developer</span><br />
-					<span>Master of All Trades, Jack of None, Invariel gets the odd jobs done. If Fugi or Hagios feels lazy, he steps in. And if YOU are a dick, he takes you out.</span><br />
-					<br />
-					<span style="font-weight: bold; font-size: 1.24em">Ganonmaster - iPhone Dev</span><br />
-					<span>Bringing the pain to your phone, so you can click on the go. </span><br />
-					<br />
-					<span style="font-weight: bold; font-size: 1.24em">Fleppensteyn - Random Dev</span><br />
-					<span>I can haz text about me?</span><br />
+				<div id="llist" class="content">
 				</div>
 				<div id="log" class="content">
 					<h2>Changelog</h2>
 					<h3>1.1</h3>
+					<b>1.6</b>
+					<ul>
+						<li>Added a list of levels with click counts associated with them. Totally required.</li>
+						<li>Finally got rid of "Meet the Team". What a terrible page.</li>
+					</ul>
 					<b>1.5</b>
 					<ul>
 						<li>Modified stats page to include people 2 ranks above or below you</li>
@@ -356,6 +341,12 @@ EOF;
 			?>');
 			tabify();
 			updateGeneral();
+			
+			$.getJSON("api.php?getLevelList",function(data) {
+				for(x in data) {
+					$("#llist").html($("#llist").html() + "Level " + data[x].level + ": " + data[x].total + " clicks [+" + data[x].increase + "]<br />");
+				}
+			});
 			
 			click.fail = 0;
 			sendmes.scroll = true;
