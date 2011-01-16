@@ -596,16 +596,16 @@ STATS;
 	//Getting level 1 requires ::first_level_clicks
 	//Each level after 1 requires the number of clicks in the previous level, times ::modifier (rounded up)
 	static function calcTotal($endLevel,$echo=False) {
-		$str = "";
+		$json = array();
 		$prev = self::first_level_clicks;
 		$total = self::first_level_clicks;
 		for($level=0;$level < $endLevel; $level++) {
-			$str .= "Level #".str_pad($level+1,3,'0',STR_PAD_LEFT).': '.number_format($total).' clicks [+'.number_format($prev).']<br />';
+			$json[] = array("level"=>$level+1,"total"=>$total,"increase"=>$prev);
 			$prev = ceil($prev * self::modifier);
 			$total +=  $prev;
 		}
-		if($echo) return $str;
-		return $total;		
+		if($echo) return $json;
+		return $total;
 	}
 	static function calcRemaining($level,$clicks) {
 		$left = self::calcTotal($level) - $clicks;

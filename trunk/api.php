@@ -53,6 +53,10 @@ if(isset($_GET['isLoggedIn'])) {
 } elseif(isset($_GET['getChatLog'])) {
 		echo json_encode(
 			USER::getChatPage((int)$_POST['pgid'],(int)$_POST['res'])
+		/* , JSON_FORCE_OBJECT */);	
+} elseif(isset($_GET['getLevelList'])) {
+		echo json_encode(
+			USER::calcTotal(100,true)
 		/* , JSON_FORCE_OBJECT */);		
 		
 		
