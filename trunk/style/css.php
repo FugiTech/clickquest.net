@@ -1,6 +1,11 @@
 ﻿<?php
 header("Content-type: text/css");
 ?>
+h2, h3 { 
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
 /*\
 |*| The Over-Arching Container
 \*/

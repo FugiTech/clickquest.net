@@ -92,7 +92,7 @@ class User
 		$this->failCount= $temp['fail'];
 		
 		$this->activity = time();
-		$this->setLevel($this->calcLevel($this->clicks+$this->modified));
+		$this->setLevel($this->calcLevel($this->getClicks()));
 		
 		if($this->banned) { $this->logout(); return array("success"=>True, "error"=>"User is Banned"); }
 		if($this->ip != $temp['ip']) { $this->db->query('UPDATE users SET ip="'.$this->db->real_escape_string($this->ip).'" WHERE id="'.($this->id).'"'); }
@@ -139,8 +139,7 @@ class User
 
 	//Specific Getter Functions
 	function getName() { return $this->name; }
-	function getClicks() { return $this->clicks; }
-	function getTotalClicks() { return $this->clicks+$this->modified; }
+	function getClicks() { return $this->clicks+$this->modified; }
 	function getLevel() { return $this->level; }
 	function getIP() { return $this->ip; }
 	function getColor() { return $this->color->getHex(); }
@@ -293,14 +292,16 @@ STATS;
 	$return .= "</table>\n";
 	
 	//Hall of Fame
-	$big = self::fullQuery("SELECT username, clicks+modified as clicks, level, color, fail FROM users WHERE hardcore=1 AND banned=0;",$this->db);
-	$return .= '<h3>Hall of Fame - For all the players who defeated Level 100 and kept going</h3>';
-	foreach($big as $row){
-		$return .= '<span style="color: #'.$row['color'].';">';
-		$return .= $row['username'].' at '.number_format($row['clicks']).' clicks [Level '.$row['level'].']&lt;'.($row['fail']*-1).' Fails&gt;';
-		$return .= '</span><br />'."\n";
+	$big = self::fullQuery("SELECT username, clicks+modified as total, level, color, fail FROM users WHERE hardcore=1 AND banned=0;",$this->db);
+	if($big!==False) {
+		$return .= '<br /><h2>Hall of Fame</h2><h3>For all the players who defeated Level 100 and kept going</h3><br />';
+		foreach($big as $row){
+			$return .= '<span style="color: #'.$row['color'].';">';
+			$return .= $row['username'].' at '.number_format($row['total']).' clicks [Level '.$row['level'].']&lt;'.($row['fail']*-1).' Fails&gt;';
+			$return .= '</span><br />'."\n";
+		}
 	}
-	$return .= "Generated at: ".date(DATE_RSS)."</p>";
+	$return .= "<br />Generated at: ".date(DATE_RSS)."</p>";
 	
 	return $return;
 }
@@ -313,15 +314,15 @@ STATS;
 		if($this->level >= 100) {
 			$str = "STOP CLICKING!!";
 			$str .= "<br /><span class='sub'>";
-			if($this->clicks < 6500000) {
+			if($this->getClicks() < 6500000) {
 				$str .= "If you keep clicking, bad things will happen!";
-			} elseif ($this->clicks < 6600000) {
+			} elseif ($this->getClicks() < 6600000) {
 				$str .= "I am not joking. Stop clicking NOW or you will regret it!";
-			} elseif ($this->clicks < 6630000) {
+			} elseif ($this->getClicks() < 6630000) {
 				$str .= "Fine, I'll tell you. If you hit 6,666,666 clicks, you get removed from the leaderboard.";
-			} elseif ($this->clicks < 6650000) {
+			} elseif ($this->getClicks() < 6650000) {
 				$str .= "You caught me. You also get on the Hall of Fame.";
-			} elseif ($this->clicks < 6660000) {
+			} elseif ($this->getClicks() < 6666000) {
 				$str .= "That isn't all though...";
 			} else {
 				$str .= "HAHAHA YOU FOOL. YOU'RE GOING TO RESET YOUR CLICKS! CAUGHT YOU!";
@@ -395,12 +396,12 @@ STATS;
 	}
 	private function setClicks($clicks) {
 		$this->clicks = $clicks;
-		if($this->clicks + $this->modified >= 6666666) {
+		if($this->getClicks() >= 6666666) {
 			$this->hardcore = true;
 			$this->clicks = -$this->modified;
 			$this->resync();
 		}
-		$this->setLevel($this->calcLevel($this->clicks+$this->modified));
+		$this->setLevel($this->calcLevel($this->getClicks()));
 	}
 	private function setLevel($level) {
 		$old = $this->level;
@@ -545,7 +546,7 @@ STATS;
 	//		$this->prev + 4 <= $values['time'] &&
 			$values['level'] == $this->calcLevel($values['newClicks'] + $values['storedClicks']) &&
 	//		$values['newClicks'] <= 60 &&
-			$values['storedClicks'] == ($this->clicks+$this->modified) &&
+			$values['storedClicks'] == ($this->getClicks()) &&
 			$values['ip'] == $this->ip &&
 			$values['color'] == $this->color->getHex() &&
 			$values['name'] == $this->name
@@ -577,7 +578,7 @@ STATS;
 			"online" => $online['html'],
 			"number" => $online['number'],
 			"chat" => $this->getChat(),
-			"clicks" => ($this->clicks+$this->modified),
+			"clicks" => ($this->getClicks()),
 			"success" => True,
 			"action" => $this->getAction()
 		)/* , JSON_FORCE_OBJECT */);

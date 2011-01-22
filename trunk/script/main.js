@@ -3,7 +3,6 @@
  * I copied it here so that syntax highlighting is better in Eclipse
  * <3 -Fugi
  */
-
 $(document).ready(function() {	
 	$('#logout').click(function(event) { 
 		$.getJSON("api.php?logOut",function(data) {
@@ -202,12 +201,11 @@ function logout() {
 	heartbeat.ip = "-2.-2.-2.-2";
 	heartbeat.color = "FFFFFF";
 	heartbeat.user = "";
-	heartbeat.hard = false;
 	heartbeat.murmur = true;
 	return;
 }
 function calcTotal(num,display) {
-	$.post('api.php?calcTotal', { level: num, hcore: heartbeat.hard }, function(data) {
+	$.post('api.php?calcTotal', { level: num }, function(data) {
 		var arg = $.parseJSON(data);
 		heartbeat.left = 1*arg.clicks;
 		if(display) displayUser();
@@ -217,7 +215,7 @@ function calcTotal(num,display) {
 }
 function displayUser() {
 	updateColor(heartbeat.color);
-	$('#left').html('<div id="name">'+heartbeat.user+'</div>'+
+	$('#left').html('<div id="name">'+(heartbeat.hard ? '[HARDCORE] ' : '')+heartbeat.user+'</div>'+
 				'<div id="level">'+heartbeat.level+'</div>'+
 				'<div id="total">total: '+(1*heartbeat.newClicks + 1*heartbeat.storedClicks)+' clicks</div>'+
 				'<div id="remain">next: '+(heartbeat.left - (1*heartbeat.newClicks + 1*heartbeat.storedClicks))+' clicks</div>'+
@@ -414,7 +412,7 @@ function loadUser() {
 		heartbeat.ip = data.ip;
 		heartbeat.color = data.color;
 		heartbeat.user = data.user;
-		heartbeat.hard = data.hcore;
+		heartbead.hard = data.hcore;
 		heartbeat.murmur = true;
 		
 		loadLog.pid=0;
