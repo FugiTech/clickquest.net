@@ -1,17 +1,9 @@
-<?php
+/*
+ * The main JS for js.php
+ * I copied it here so that syntax highlighting is better in Eclipse
+ * <3 -Fugi
+ */
 
-require("../include/color.php");
-require("../include/packer.php");
-
-ob_start("packer");
-
-function packer($str) {
-	$packer = new JavaScriptPacker($str,'High ASCII');
-	return $packer->pack();
-}
-
-header("Content-type: application/x-javascript");
-?>
 $(document).ready(function() {	
 	$('#logout').click(function(event) { 
 		$.getJSON("api.php?logOut",function(data) {

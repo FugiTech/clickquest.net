@@ -23,6 +23,7 @@ if(isset($_GET['isLoggedIn'])) {
 			"ip" => $USER->getIP(),
 			"color" => $USER->getColor(),
 			"user" => $USER->getName(),
+			"hcore" => $USER->isHardcore(),
 			"action" => $USER->getAction()
 		)/* , JSON_FORCE_OBJECT */);
 		
@@ -35,7 +36,7 @@ if(isset($_GET['isLoggedIn'])) {
 		echo $USER->proccessHeartbeat($_POST['action']);
 } elseif(isset($_GET['calcTotal'])) {
 		echo json_encode(array(
-			"clicks" => User::calcTotal($_POST['level'])
+			"clicks" => User::calcTotal($_POST['level'],$_POST['hcore'])
 		)/* , JSON_FORCE_OBJECT */);
 		
 		

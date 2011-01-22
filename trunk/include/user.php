@@ -11,6 +11,7 @@ class User
 	const initial_clicks = 0;
 	const first_level_clicks = 100;
 	const modifier = 1.09;
+	const hcoremod = 0.01;
 	
 	//Basic info
 	private $id = -1;
@@ -44,6 +45,7 @@ class User
 	private $banned = False;
 	private $online = -1;
 	private $failCount = 0;
+	private $hardcore = False;
 	
 	//Handles
 	private $db;
@@ -83,6 +85,7 @@ class User
 		$this->mod		= $temp['mod'];
 		$this->LRR		= $temp['lrr'];
 		$this->banned	= $temp['banned'];
+		$this->hardcore	= $temp['hardcore'];
 		$this->online	= $temp['online'];
 		$this->total	= $temp['totaltime'];
 		$this->logged_in= 1;
@@ -120,6 +123,7 @@ class User
 		$this->mod = False;
 		$this->LRR = False;
 		$this->banned = False;
+		$this->hardcore = False;
 		$this->online = -1;
 		$this->db = null;
 		$this->fatal=False;
@@ -147,17 +151,18 @@ class User
 	function isMod() { return ($this->mod ? True : False); }
 	function isLRR() { return ($this->LRR ? True : False); }
 	function isBanned() { return ($this->banned ? True : False); }
+	function isHardcore() { return ($this->hardcore ? True : False); }
 	function isIn() { return ($this->logged_in ? True : False); }
 	
 	//General Getter Functions
 	static function getOnline() {
 		$db = self::connect();
-		$result = $db->query('SELECT level, color, username FROM users WHERE banned=0 AND online>'.(time()-120).' ORDER BY id ASC');
+		$result = $db->query('SELECT level, color, username, hardcore FROM users WHERE banned=0 AND online>'.(time()-120).' ORDER BY id ASC');
 				if($result===False) return $db->error;
 		$return = '<div class="holder"><div class="row1">';
 		$key = 0;
 		while($value = $result->fetch_assoc()) {
-			$return .= '<div class="other" style="color: #'.$value['color'].';"><span class="name">'.$value['username'].'</span><br /><span class="level">'.$value['level'].'</span></div>';
+			$return .= '<div class="other" style="color: #'.$value['color'].';"><span class="name">'.($value['hardcore'] ? '[H]' : '').$value['username'].'</span><br /><span class="level">'.$value['level'].'</span></div>';
 			if(($key+6) % 10 == 0) $return .= '</div><div class="row2">';
 			if(($key+1) % 10 == 0) $return .= '</div></div><div class="holder"><div class="row1">';
 			$key++;
@@ -221,11 +226,11 @@ class User
 		return array("log"=>$return, "pid"=>$pid, "pages"=>$pages, "lines"=>$lines, "results"=>$results);
 	}
 	function getStats($offset=2) {
-		$result	= self::arrayQuery('SELECT count(id) as user, sum(clicks+modified) as total, sum(level) as level, sum(fail) as fail FROM users WHERE banned=0');
+		$result	= self::arrayQuery('SELECT count(id) as user, sum(clicks+modified) as total, sum(level) as level, sum(fail) as fail FROM users WHERE banned=0 AND hardcore=0');
 		$r = $this->db->query("CREATE TEMPORARY TABLE leaderboard ( `rank` INT NOT NULL AUTO_INCREMENT, `username` VARCHAR( 16 ) NOT NULL, `level` INT NOT NULL DEFAULT '0', `clicks` INT NOT NULL DEFAULT '0', `color` CHAR(6) NOT NULL, `lrr` TINYINT NOT NULL DEFAULT '0',`fail` INT NOT NULL DEFAULT '0', PRIMARY KEY ( `rank` )) ENGINE=MEMORY;");
 		if($r === False)
 			logDebug("FAILED TO CREATE TABLE");
-		$r = $this->db->query("INSERT INTO leaderboard (username, level, clicks, color, lrr, fail) SELECT username, level, (clicks+modified), color, lrr, fail FROM users WHERE banned = 0 ORDER BY (clicks+modified) DESC;");
+		$r = $this->db->query("INSERT INTO leaderboard (username, level, clicks, color, lrr, fail) SELECT username, level, (clicks+modified), color, lrr, fail FROM users WHERE banned = 0 AND hardcore=0 ORDER BY (clicks+modified) DESC;");
 		if($r === False)
 			logDebug("FAILED TO POPULATE TABLE");
 		$rank = (int)self::arrayQuery("SELECT rank FROM leaderboard WHERE username='".$this->name."';",'rank',$this->db);
@@ -271,6 +276,7 @@ STATS;
 			FROM users
 			WHERE 
 			banned=0 AND
+			hardcore=0 AND
 			(
 				color="'.$val['normal'].'" OR
 				color="'.$val['light'].'" OR
@@ -284,7 +290,17 @@ STATS;
 		$return .= '<td>'.number_format($result['total']/$result['user']).'</td>';
 		$return .= '</tr>';
 	}
-	$return .= "</table>\nGenerated at: ".date(DATE_RSS)."</p>";
+	$return .= "</table>\n";
+	
+	//Hall of Fame
+	self::fullQuery("SELECT username, clicks, level, color, fail FROM users WHERE hardcore=1 AND banned=0;",$this->db);
+	$return .= '<h3>Hall of Fame - For all the players who defeated Level 100 and kept going</h3>';
+	foreach($big as $row){
+		$return .= '<span style="color: #'.$row['color'].';">';
+		$return .= $row['username'].' at '.number_format($row['clicks']).' clicks [Level '.$row['level'].']&lt;'.($row['fail']*-1).' Fails&gt;';
+		$return .= '</span><br />'."\n";
+	}
+	$return .= "Generated at: ".date(DATE_RSS)."</p>";
 	
 	return $return;
 }
@@ -293,6 +309,26 @@ STATS;
 	function checkIdle() { $this->idle = ($this->activity > time()-120 ? True : False); }
 	private function buildAction() {
 		$this->action = array();
+		//Level 100? Flip a bitch!
+		if($this->level >= 100) {
+			$str = "STOP CLICKING!!";
+			$str .= "<br /><span class='sub'>";
+			if($this->clicks < 6500000) {
+				$str .= "If you keep clicking, bad things will happen!";
+			} elseif ($this->clicks < 6600000) {
+				$str .= "I am not joking. Stop clicking NOW or you will regret it!";
+			} elseif ($this->clicks < 6630000) {
+				$str .= "Fine, I'll tell you. If you hit 6,666,666 clicks, you get removed from the leaderboard.";
+			} elseif ($this->clicks < 6650000) {
+				$str .= "You caught me. You also get on the Hall of Fame.";
+			} elseif ($this->clicks < 6660000) {
+				$str .= "That isn't all though...";
+			} else {
+				$str .= "HAHAHA YOU FOOL. YOU'RE GOING TO RESET YOUR CLICKS! CAUGHT YOU!";
+			}
+			$str .= "</span>";
+			array_push($this->action,$str);
+		}
 		//Initial Color Selection
 		if($this->level < 75 && $this->color->isDefault()) {
 			$str = "Select A Color:<br /><span class='sub'>";
@@ -340,6 +376,8 @@ STATS;
 		} else {
 			$name = $this->name;
 		}
+		if($this->hardcore)
+			$name = '[H]'.$name;
 		return $this->db->query("INSERT INTO chat(userid, name, message, color, level, ip, time) VALUES ('".$this->id."', '".$name."', '".$this->db->real_escape_string(preg_replace('(\bhttp://[^ ]+\b)', '<a href="$0" target="_blank">$0</a>', ($this->admin ? $mes : htmlspecialchars($mes))))."', '".$this->color->getHex()."', '".$this->level."', '".$this->ip."', '".time()."')");
 	}
 	function setColor($code) {
@@ -357,6 +395,11 @@ STATS;
 	}
 	private function setClicks($clicks) {
 		$this->clicks = $clicks;
+		if($this->clicks + $this->modified >= 6666666) {
+			$this->hardcore = true;
+			$this->clicks = -$this->modified;
+			$this->resync();
+		}
 		$this->setLevel($this->calcLevel($this->clicks+$this->modified));
 	}
 	private function setLevel($level) {
@@ -364,7 +407,7 @@ STATS;
 		$this->level = $level;
 	}
 	private function calcLevel($clicks) {
-		for($level=0; $clicks >= $this->calcTotal($level); $level++);
+		for($level=0; $clicks >= $this->calcTotal($level,false,$this->hardcore); $level++);
 		return $level;
 	}
 		
@@ -384,7 +427,7 @@ STATS;
 	//	}
 	}
 	private function resync() {
-		if(!$this->db->query('UPDATE users SET clicks='.$this->clicks.', level='.$this->level.', online='.$this->activity.' WHERE id='.($this->id)))
+		if(!$this->db->query('UPDATE users SET clicks='.$this->clicks.', hardcore='.$this->hardcore.', level='.$this->level.', online='.$this->activity.' WHERE id='.($this->id)))
 			logError($this->db->error);
 		$this->sync = time();
 	}
@@ -595,21 +638,21 @@ STATS;
 	//Start at level 0,  with ::initial_clicks of clicks
 	//Getting level 1 requires ::first_level_clicks
 	//Each level after 1 requires the number of clicks in the previous level, times ::modifier (rounded up)
-	static function calcTotal($endLevel,$echo=False) {
+	static function calcTotal($endLevel,$echo=False,$hcore=False) {
 		$json = array();
 		$prev = self::first_level_clicks;
 		$total = self::first_level_clicks;
 		for($level=0;$level < $endLevel; $level++) {
 			$json[] = array("level"=>$level+1,"total"=>$total,"increase"=>$prev);
-			$prev = ceil($prev * self::modifier);
+			$prev = ceil($prev * (self::modifier + ($hcore ? self::hcoremod : 0)));
 			$total +=  $prev;
 		}
 		if($echo) return $json;
 		return $total;
 	}
-	static function calcRemaining($level,$clicks) {
-		$left = self::calcTotal($level) - $clicks;
-		if($left==0) $left = self::calcTotal($level+1) - $clicks;
+	static function calcRemaining($level,$clicks,$hcore=False) {
+		$left = self::calcTotal($level,False,$hcore) - $clicks;
+		if($left==0) $left = self::calcTotal($level+1,False,$hcore) - $clicks;
 		return $left;
 	}
 	// Database Functions

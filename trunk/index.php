@@ -8,9 +8,9 @@
 		<script type="text/javascript" src="script/cycle.js"></script>
 		<script type="text/javascript" src="script/extend.js"></script> 
 		<script type="text/javascript" src="script/js.php"></script>
-		<link href="style/css.php" rel="stylesheet" type="text/css">
-<?php if(isset($_GET['small'])) { ?>		<link href="style/small-css.php" rel="stylesheet" type="text/css">
-<?php } ?>		<link href="style/ui.css" rel="stylesheet" type="text/css">
+		<link href="style/css.php" rel="stylesheet" type="text/css" />
+<?php if(isset($_GET['small'])) { ?>		<link href="style/small-css.php" rel="stylesheet" type="text/css" />
+<?php } ?>		<link href="style/ui.css" rel="stylesheet" type="text/css" />
 	</head>
 	<body>
 		<!--<div id="overlay">
