@@ -293,7 +293,7 @@ STATS;
 	$return .= "</table>\n";
 	
 	//Hall of Fame
-	self::fullQuery("SELECT username, clicks, level, color, fail FROM users WHERE hardcore=1 AND banned=0;",$this->db);
+	$big = self::fullQuery("SELECT username, clicks+modified as clicks, level, color, fail FROM users WHERE hardcore=1 AND banned=0;",$this->db);
 	$return .= '<h3>Hall of Fame - For all the players who defeated Level 100 and kept going</h3>';
 	foreach($big as $row){
 		$return .= '<span style="color: #'.$row['color'].';">';
