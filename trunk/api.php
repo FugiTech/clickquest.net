@@ -36,7 +36,7 @@ if(isset($_GET['isLoggedIn'])) {
 		echo $USER->proccessHeartbeat($_POST['action']);
 } elseif(isset($_GET['calcTotal'])) {
 		echo json_encode(array(
-			"clicks" => User::calcTotal($_POST['level'],$_POST['hcore'])
+			"clicks" => User::calcTotal($_POST['level'],false,$_POST['hcore'])
 		)/* , JSON_FORCE_OBJECT */);
 		
 		
