@@ -316,14 +316,28 @@ STATS;
 			$str .= "<br /><span class='sub'>";
 			if($this->getClicks() < 6500000) {
 				$str .= "If you keep clicking, bad things will happen!";
-			} elseif ($this->getClicks() < 6600000) {
+			} elseif ($this->getClicks() < 6525000) {
 				$str .= "I am not joking. Stop clicking NOW or you will regret it!";
-			} elseif ($this->getClicks() < 6630000) {
+			} elseif ($this->getClicks() < 6550000) {
+				$str .= "Seriously? What do I have to say to get you to stop?";
+			} elseif ($this->getClicks() < 6575000) {
+				$str .= "You know what? I don't care. Keep clicking!";
+			} elseif ($this->getClicks() < 6600000) {
+				$str .= "Reverse psychology didn't work? Then how about this. I will kill your pets/family/friends if you don't stop.";
+			} elseif ($this->getClicks() < 6610000) {
 				$str .= "Fine, I'll tell you. If you hit 6,666,666 clicks, you get removed from the leaderboard.";
-			} elseif ($this->getClicks() < 6650000) {
+			} elseif ($this->getClicks() < 6620000) {
+				$str .= "NOBODY WILL KNOW YOU EXIST.";
+			} elseif ($this->getClicks() < 6630000) {
 				$str .= "You caught me. You also get on the Hall of Fame.";
-			} elseif ($this->getClicks() < 6666000) {
+			} elseif ($this->getClicks() < 6640000) {
+				$str .= "That isn't really a good thing though. Its kind of hidden away.";
+			} elseif ($this->getClicks() < 6650000) {
+				$str .= "As in 'bottom of the stats page where nobody looks' hidden away.";
+			} elseif ($this->getClicks() < 6660000) {
 				$str .= "That isn't all though...";
+			} elseif ($this->getClicks() < 6666000) {
+				$str .= "You know how mean I am. There is always something bad.";
 			} else {
 				$str .= "HAHAHA YOU FOOL. YOU'RE GOING TO RESET YOUR CLICKS! CAUGHT YOU!";
 			}
