@@ -338,6 +338,8 @@ STATS;
 				$str .= "That isn't all though...";
 			} elseif ($this->getClicks() < 6666000) {
 				$str .= "You know how mean I am. There is always something bad.";
+			} elseif ($this->getClicks() < 6666600) {
+				$str .= "And between you and me, this is my best troll to date!";
 			} else {
 				$str .= "HAHAHA YOU FOOL. YOU'RE GOING TO RESET YOUR CLICKS! CAUGHT YOU!";
 			}
