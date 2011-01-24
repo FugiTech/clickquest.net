@@ -368,7 +368,7 @@ STATS;
 		}
 
 		//Lulz
-		if(False) {
+		if($this->hardcore) {
 			$str = "DON'T PANIC";
 			array_push($this->action,$str);
 		}
