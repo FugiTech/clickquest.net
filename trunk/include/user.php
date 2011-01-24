@@ -11,7 +11,8 @@ class User
 	const initial_clicks = 0;
 	const first_level_clicks = 100;
 	const modifier = 1.09;
-	const hcoremod = 0.01;
+	const hcoremod = 0.02;
+	const hcoreadd = 100;
 	
 	//Basic info
 	private $id = -1;
@@ -225,7 +226,7 @@ class User
 		return array("log"=>$return, "pid"=>$pid, "pages"=>$pages, "lines"=>$lines, "results"=>$results);
 	}
 	function getStats($offset=2) {
-		$result	= self::arrayQuery('SELECT count(id) as user, sum(clicks+modified) as total, sum(level) as level, sum(fail) as fail FROM users WHERE banned=0 AND hardcore=0');
+		$result	= self::arrayQuery('SELECT count(id) as user, sum(clicks+modified)+(sum(hardcore)*6666666) as total, sum(level) as level, sum(fail) as fail FROM users WHERE banned=0');
 		$r = $this->db->query("CREATE TEMPORARY TABLE leaderboard ( `rank` INT NOT NULL AUTO_INCREMENT, `username` VARCHAR( 16 ) NOT NULL, `level` INT NOT NULL DEFAULT '0', `clicks` INT NOT NULL DEFAULT '0', `color` CHAR(6) NOT NULL, `lrr` TINYINT NOT NULL DEFAULT '0',`fail` INT NOT NULL DEFAULT '0', PRIMARY KEY ( `rank` )) ENGINE=MEMORY;");
 		if($r === False)
 			logDebug("FAILED TO CREATE TABLE");
@@ -657,8 +658,8 @@ STATS;
 	//Each level after 1 requires the number of clicks in the previous level, times ::modifier (rounded up)
 	static function calcTotal($endLevel,$echo=False,$hcore=False) {
 		$json = array();
-		$prev = self::first_level_clicks;
-		$total = self::first_level_clicks;
+		$prev = self::first_level_clicks + ($hcore ? self::hcoreadd : 0);
+		$total = self::first_level_clicks + ($hcore ? self::hcoreadd : 0);
 		for($level=0;$level < $endLevel; $level++) {
 			$json[] = array("level"=>$level+1,"total"=>$total,"increase"=>$prev);
 			$prev = ceil($prev * (self::modifier + ($hcore ? self::hcoremod : 0)));

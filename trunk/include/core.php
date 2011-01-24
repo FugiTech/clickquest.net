@@ -18,8 +18,8 @@ date_default_timezone_set('America/New_York');
 define("NAME","CLICKQUEST");
 define("VERSION","1");
 define("MAJOR","1");
-define("MINOR","1");
-define("REVISION","6");
+define("MINOR","2");
+define("REVISION","0");
 define("COPYRIGHT","Copyright 2010 Bionic Trousers / Exim Works");
 
 //Make sure we have functionality
