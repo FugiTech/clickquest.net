@@ -259,7 +259,7 @@ function displayUser() {
 				<div id="log" class="content">
 					<h2>Changelog</h2>
 					<h3>1.1</h3>
-					<b>30</b>
+					<b>2.0</b>
 					<ul>
 						<li>Added a click cap, with warning messages leading up to it.</li>
 						<li>---REDACTED---</li>
