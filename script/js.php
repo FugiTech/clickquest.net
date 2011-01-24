@@ -259,6 +259,11 @@ function displayUser() {
 				<div id="log" class="content">
 					<h2>Changelog</h2>
 					<h3>1.1</h3>
+					<b>30</b>
+					<ul>
+						<li>Added a click cap, with warning messages leading up to it.</li>
+						<li>---REDACTED---</li>
+					</ul>
 					<b>1.6</b>
 					<ul>
 						<li>Added a list of levels with click counts associated with them. Totally required.</li>

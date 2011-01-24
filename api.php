@@ -57,7 +57,7 @@ if(isset($_GET['isLoggedIn'])) {
 		/* , JSON_FORCE_OBJECT */);	
 } elseif(isset($_GET['getLevelList'])) {
 		echo json_encode(
-			USER::calcTotal(100,true)
+			USER::calcTotal(100,true,$USER->isHardcore())
 		/* , JSON_FORCE_OBJECT */);		
 		
 		
