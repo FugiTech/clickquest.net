@@ -14,8 +14,8 @@ $db->queryExec('CREATE TABLE users (
 	admin INTEGER NOT NULL DEFAULT 0,
 	banned INTEGER NOT NULL DEFAULT 0
 )');
-//$db->queryExec('INSERT INTO users(username,password,ip,admin,clicks) VALUES("Fugiman","roflcopter","",1,13371337)');
-//$db->queryExec('INSERT INTO users(username,password,ip,admin) VALUES("herpa_derp","alex","",1)');
+//$db->queryExec('INSERT INTO users(username,password,ip,admin,clicks) VALUES("Fugiman","xxxxxxxxxx","",1,13371337)');
+//$db->queryExec('INSERT INTO users(username,password,ip,admin) VALUES("herpa_derp","xxxxxxxxxxx","",1)');
 
 */
 $db = sqlite_factory('chat.sql');
