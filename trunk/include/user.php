@@ -293,7 +293,7 @@ STATS;
 	$return .= "</table>\n";
 	
 	//Hall of Fame
-	$big = self::fullQuery("SELECT username, clicks+modified as total, level, color, fail FROM users WHERE hardcore=1 AND banned=0;",$this->db);
+	$big = self::fullQuery("SELECT username, clicks+modified as total, level, color, fail FROM users WHERE hardcore>0 AND banned=0 ORDER BY hardcore ASC;",$this->db);
 	if($big!==False) {
 		$return .= '<br /><h2>Hall of Fame</h2><h3>For all the players who defeated Level 100 and kept going</h3><br />';
 		foreach($big as $row){
@@ -414,7 +414,7 @@ STATS;
 	private function setClicks($clicks) {
 		$this->clicks = $clicks;
 		if($this->getClicks() >= 6666666) {
-			$this->hardcore = true;
+			$this->hardcore = $this->arrayQuery("SELECT max(`hardcore`) as hc FROM users","hc",$this->db);
 			$this->clicks = -$this->modified;
 			$this->resync();
 		}
