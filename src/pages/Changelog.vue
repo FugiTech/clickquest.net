@@ -4,8 +4,11 @@
     <h3>2.0</h3>
     <b>0.0</b>
     <ul>
-      <li>Rewrote the entire site & backend in vue.js & golang respectively</li>
+      <li>Rewrote the entire site & backend in vue.js & golang respectively.</li>
+      <li>As a result everything loads faster and syncs faster.</li>
       <li>Slightly adjusted the leveling algorithm to emulate the rounding errors of 1.X. Earlier levels are now easier to achieve.</li>
+      <li>Slightly adjusted the non-hardcore end-game to be less mean and more fun.</li>
+      <li>Added Hardcore+.</li>
     </ul>
     <h3>1.1</h3>
     <b>2.0</b>

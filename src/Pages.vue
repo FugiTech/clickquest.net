@@ -5,13 +5,14 @@
       <tab name="Statistics"><statistics /></tab>
       <tab name="Level List"><levelList /></tab>
       <tab name="Changelog"><changelog /></tab>
-      <tab name="Color List"><colorList /></tab>
+      <tab name="Color Select" :show="level >= 75"><colorList /></tab>
       <tab name="Chatlog"><chatlog /></tab>
     </tabs>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Chat from './pages/Chat'
 import Statistics from './pages/Statistics'
 import LevelList from './pages/LevelList'
@@ -28,6 +29,11 @@ export default {
     Changelog,
     ColorList,
     Chatlog
+  },
+  computed: {
+    ...mapGetters([
+      'level'
+    ])
   }
 }
 </script>
@@ -35,7 +41,7 @@ export default {
 <style scoped>
 .pages {
   flex: 50%;
-  padding: 0 50px;
+  padding: 0 20px;
 }
 </style>
 
@@ -59,6 +65,7 @@ export default {
   margin-right: 4px;
   border: 1px solid white;
   border-bottom: 0;
+  white-space: nowrap;
 }
 
 .tabs > ul li a {

@@ -1,24 +1,35 @@
 <template>
   <div class="chat">
-    <div class="messages"></div>
+    <chatlist :chat="chat"></chatlist>
     <form class="sender" v-show="isLoggedIn" @submit.prevent="sendMessage">
       <input type="text" class="mes">
       <input type="submit" class="messend" value="Send">
     </form>
+    <span class="help" v-show="isLoggedIn"><b>*bold*</b> <i>_italic_</i> <a href="#" @click.prevent>[link text](url)</a> (or just type a URL) \escape</span>
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState } from 'vuex'
+import chatlist from '../components/chatlist'
 
 export default {
   name: 'chat',
+  components: {
+    chatlist
+  },
   computed: mapState([
-    'isLoggedIn'
+    'isLoggedIn',
+    'chat',
+    'send'
   ]),
-  methods: mapActions([
-    'sendMessage'
-  ])
+  methods: {
+    sendMessage: function (e) {
+      let message = e.target.elements[0].value
+      e.target.elements[0].value = ''
+      this.send('chat', {message: message})
+    }
+  }
 }
 </script>
 
@@ -26,10 +37,6 @@ export default {
 .chat {
   display: flex;
   flex-direction: column;
-  flex: auto;
-}
-
-.messages {
   flex: auto;
 }
 
@@ -45,5 +52,9 @@ export default {
   border: 1px solid gray;
   color: white;
   font-size: 1em;
+}
+
+.help {
+  color: #333;
 }
 </style>

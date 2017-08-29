@@ -1,16 +1,20 @@
-import { clicksForLevel } from '../utils'
+import { levelForClicks } from '../utils'
 
-export const userTitle = (state) => {
-  return state.user.hardcore ? '[HARDCORE] ' + state.user.name : state.user.name
-}
-
-export const userStyle = (state) => {
-  return {
-    color: state.user.color
+export const userColor = (state) => {
+  let types = ['Normal', 'Dark', 'Light']
+  for (let i = 0; i < state.colors.length; i++) {
+    for (let j = 0; j < types.length; j++) {
+      if (state.colors[i][types[j]] === state.user.color) {
+        let color = state.colors[i]
+        color.selected = types[j]
+        return color
+      }
+    }
   }
+  return {Name: 'default', Normal: '#FFFFFF', selected: 'Normal'}
 }
 
-export const nextClicks = (state) => {
-  let next = clicksForLevel(state.user.level + 1, state.user.hardcore)
-  return next - state.user.clicks
+export const level = (state) => {
+  if (!state.user) return 0
+  return levelForClicks(state.user.clicks, state.user.hardcore)
 }

@@ -1,8 +1,17 @@
 <template>
-  <div class="app" @click="click">
-    <top />
-    <middle />
-    <bottom />
+  <div class="app">
+    <div class="main" @click="click">
+      <top />
+      <middle />
+      <bottom />
+    </div>
+    <div class="modal" v-if="error">
+      <div>
+        <h1>ERROR</h1>
+        <p>{{error}}</p>
+        <button @click="setError('')">OK</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -31,10 +40,12 @@ export default {
     'MAJOR',
     'MINOR',
     'PATCH',
-    'REVISION'
+    'REVISION',
+    'error'
   ]),
   methods: mapMutations([
-    'click'
+    'click',
+    'setError'
   ])
 }
 </script>
@@ -56,13 +67,79 @@ html, body, .app {
 
 .app {
   display: flex;
-  flex-direction: column;
   font-family: "DOS", "Courier", sans-serif;
   background: black;
   color: white;
 }
 
+.main {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+}
+
+@media(max-width: 1500px) { .app { font-size: 0.95em; } }
+@media(max-width: 1350px) { .app { font-size: 0.90em; } }
+@media(max-width: 1290px) { .app { font-size: 0.85em; } }
+@media(max-width: 1240px) { .app { font-size: 0.80em; } }
+@media(max-width: 1190px) { .app { font-size: 0.75em; } }
+@media(max-width: 1130px) { .app { font-size: 0.70em; } }
+@media(max-width: 1080px) { .app { font-size: 0.65em; } }
+
+@media(min-width: 1600px) { .user { font-size: 1.5em !important; } }
+@media(min-width: 1700px) { .user { font-size: 1.6em !important; } }
+@media(min-width: 1800px) { .user { font-size: 1.7em !important; } }
+@media(min-width: 1900px) { .user { font-size: 1.8em !important; } }
+@media(min-width: 2000px) { .user { font-size: 1.9em !important; } }
+@media(min-width: 2100px) { .user { font-size: 2.0em !important; } }
+
 a {
   color: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: black;
+}
+::-webkit-scrollbar-thumb {
+  background: #333333;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.8);
+}
+.modal > div {
+  width: 20%;
+  background: black;
+  border: 1px solid white;
+  text-align: right;
+}
+.modal h1 {
+  margin: 0;
+  border-bottom: 1px solid white;
+  text-align: center;
+}
+.modal p {
+  margin: 0;
+  padding: 10px 20px;
+  text-align: left;
+}
+.modal button {
+  margin: 5px 10px;
+  padding: 5px 20px;
+  border: 1px solid white;
+  background: black;
+  color: inherit;
+  font-size: 1.2em;
 }
 </style>

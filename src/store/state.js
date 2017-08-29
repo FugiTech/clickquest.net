@@ -5,21 +5,26 @@ export default {
   PATCH: 0,
   REVISION: 0,
 
-  // User Info
+  error: '',
   isLoggedIn: false,
-  user: {},
+  colors: [
+    {Name: 'red', Normal: '#FF0000', Dark: '#990000', Light: '#FF6565'},
+    {Name: 'yellow', Normal: '#FFFF00', Dark: '#999900', Light: '#FFFF65'},
+    {Name: 'green', Normal: '#00FF00', Dark: '#009900', Light: '#65FF65'},
+    {Name: 'blue', Normal: '#0000FF', Dark: '#000099', Light: '#6565FF'},
+    {Name: 'cyan', Normal: '#00FFFF', Dark: '#009999', Light: '#65FFFF'},
+    {Name: 'magenta', Normal: '#FF00FF', Dark: '#990099', Light: '#FF65FF'},
+    {Name: 'orange', Normal: '#FF5721', Dark: '#B13E0F', Light: '#FF9912'},
+    {Name: 'purple', Normal: '#9900CC', Dark: '#660099', Light: '#9933CC'},
+    {Name: 'gray', Normal: '#666666', Dark: '#333333', Light: '#CCCCCC'}
+  ],
 
-  // Statistics page
-  stats: {
-    users: 5948,
-    clicks: 2208464446,
-    avgClicks: 371295,
-    avgLevel: 8,
-    topTen: [
-      {name: 'Hardcore_Blitz', color: '#9900CC', clicks: 6623421, level: 100}
-    ],
-    colors: [
-      {name: 'red', color: '#FF0000', players: 812, maxClicks: 5480212, clicks: 13342214, avgClicks: 16431}
-    ]
-  }
+  // The server
+  send: (_, __) => {},
+
+  // Populated by the server
+  user: {},
+  chat: [],
+  stats: {},
+  players: []
 }

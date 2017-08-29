@@ -46,12 +46,7 @@ export default {
   name: 'statistics',
   computed: mapState([
     'stats'
-  ]),
-  filters: {
-    commaify: (value) => {
-      return value ? value.toLocaleString('en-US') : ''
-    }
-  }
+  ])
 }
 </script>
 
