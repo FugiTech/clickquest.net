@@ -32,7 +32,9 @@ export default {
   head: {
     title: function () {
       return {
-        inner: `CLICKQUEST V${this.MAJOR}.${this.MINOR}.${this.PATCH}:${this.REVISION}`
+        inner: `CLICKQUEST V${this.MAJOR}.${this.MINOR}.${this.PATCH}:${this.REVISION}`,
+        separator: ' ',
+        complement: ' '
       }
     }
   },
