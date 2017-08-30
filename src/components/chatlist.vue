@@ -50,4 +50,8 @@ export default {
   vertical-align: top;
   max-height: 200px;
 }
+
+.messages ::selection {
+  background: #808080;
+}
 </style>

@@ -107,6 +107,10 @@ a {
   background: #333333;
 }
 
+::selection {
+  background: transparent;
+}
+
 .modal {
   position: fixed;
   top: 0;
