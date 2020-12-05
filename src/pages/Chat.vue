@@ -11,7 +11,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import chatlist from '../components/chatlist'
+import chatlist from '../components/chatlist.vue'
 
 export default {
   name: 'chat',

@@ -1,12 +1,14 @@
 <template>
 <div class="tabs">
   <ul>
-    <li v-for="(tab, idx) in tabs" v-if="tab.show" :class="{ 'active': tab.isActive }">
-      <a :href="'#'+tab.name" @click.prevent="selectTab(idx)">{{ tab.name }}</a>
-    </li>
+    <template v-for="(tab, idx) in tabs">
+      <li v-if="tab.show" :class="{ 'active': tab.isActive }">
+        <a :href="'#'+tab.name" @click.prevent="selectTab(idx)">{{ tab.name }}</a>
+      </li>
+    </template>
   </ul>
   <div>
-    <slot/>
+    <slot />
   </div>
 </div>
 </template>
@@ -14,14 +16,8 @@
 <script>
   export default {
     data: () => ({ tabs: [] }),
-    created () {
-      this.tabs = this.$children
-    },
-    mounted () {
+    mounted() {
       this.selectTab(0)
-      this.tabs.forEach((tab) => {
-        tab.reset = () => { this.selectTab(0) }
-      })
     },
     methods: {
       selectTab (selectedIndex) {

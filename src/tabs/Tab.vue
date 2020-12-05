@@ -12,8 +12,13 @@
     },
     data: () => ({
       isActive: false,
-      reset: () => {}
+      reset: () => {
+        this.$parent.selectTab(0)
+      }
     }),
+    created() {
+      this.$parent.tabs.push(this)
+    },
     watch: {
       show: function () {
         if (!this.show && this.isActive) this.reset()

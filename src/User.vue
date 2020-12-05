@@ -54,7 +54,7 @@
       <div class="server">
         <div>
           <div class="ip">SERVER IP: 174.138.111.200</div>
-          <div class="logintime">ON SINCE: {{ user.sessionStart | moment('h:mmA M/D/Y')}}</div>
+          <div class="logintime">ON SINCE: {{ $moment(user.sessionStart, 'h:mmA M/D/Y')}}</div>
         </div>
         <div>
           <div class="session">SESSION TIME: {{ sessionTime }}</div>
@@ -82,7 +82,6 @@
 
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
-import { clicksForLevel } from './utils'
 import rng from 'seedrandom'
 
 const glitchSeed = 1
@@ -123,7 +122,7 @@ export default {
     },
     nextClicks: function () {
       if (this.level === 100 && this.user.hardcore === 0) return '∞'
-      return clicksForLevel(this.level + 1, this.user.hardcore) - this.user.clicks
+      return this.$clicksForLevel(this.level + 1, this.user.hardcore) - this.user.clicks
     },
     showGlitch: function () {
       return this.user.clicks >= 6666600 && this.user.hardcore === 0
@@ -151,7 +150,6 @@ export default {
       'login',
       'setColor'
     ]),
-    clicksForLevel,
     gdata: function (polygonNum, rectNum, attrNum) {
       polygonNum = Math.floor(polygonNum * glitchSteps / 100.0)
       return this.glitchRectData[attrNum + 2 * (rectNum + glitchSteps * polygonNum)]
@@ -165,7 +163,7 @@ export default {
       this.now = new Date()
     }, 200)
   },
-  beforeDestroy: function () {
+  beforeUnmount: function () {
     clearInterval(this.timer)
   }
 }
@@ -173,6 +171,7 @@ export default {
 
 <style scoped lang="scss">
 .user {
+  grid-area: user;
   display: flex;
   flex-direction: column;
   align-items: center;

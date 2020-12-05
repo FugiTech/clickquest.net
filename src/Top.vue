@@ -2,7 +2,7 @@
   <div class="top">
     <div class="title">
       <div class="version">CLICKQUEST VERSION {{MAJOR}} PATCH {{MINOR}} REVISION {{PATCH}}.{{REVISION}}</div>
-      <div class="copyright">Copyright 2010-17 Bionic Trousers / Exim Works</div>
+      <div class="copyright">Copyright 2010-20 Bionic Trousers / Exim Works</div>
     </div>
     <div class="links">
       <div class="twitter">Twitter:
@@ -42,8 +42,8 @@ export default {
 
 <style scoped>
 .top {
+  grid-area: top;
   display: flex;
-  flex: none;
   padding: 15px 50px;
 }
 

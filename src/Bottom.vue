@@ -7,7 +7,7 @@
 
       <div v-for="player in players" :style="{color: player.color}">
         <p class="name">{{ player.hardcore ? '[H]' : '' }}{{ player.name }}</p>
-        <p class="level">{{ levelForClicks(player.clicks, player.hardcore) }}</p>
+        <p class="level">{{ $levelForClicks(player.clicks, player.hardcore) }}</p>
       </div>
     </div>
   </div>
@@ -15,23 +15,19 @@
 
 <script>
 import { mapState } from 'vuex'
-import { levelForClicks } from './utils'
 
 export default {
   name: 'bottom',
   computed: mapState([
     'players'
   ]),
-  methods: {
-    levelForClicks
-  }
 }
 </script>
 
 <style scoped>
 .bottom {
+  grid-area: bottom;
   display: flex;
-  flex: none;
   flex-direction: column;
   margin: 15px;
   text-align: center;

@@ -13,12 +13,12 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import Chat from './pages/Chat'
-import Statistics from './pages/Statistics'
-import LevelList from './pages/LevelList'
-import Changelog from './pages/Changelog'
-import ColorList from './pages/ColorList'
-import Chatlog from './pages/Chatlog'
+import Chat from './pages/Chat.vue'
+import Statistics from './pages/Statistics.vue'
+import LevelList from './pages/LevelList.vue'
+import Changelog from './pages/Changelog.vue'
+import ColorList from './pages/ColorList.vue'
+import Chatlog from './pages/Chatlog.vue'
 
 export default {
   name: 'pages',
@@ -40,7 +40,7 @@ export default {
 
 <style scoped>
 .pages {
-  flex: 50%;
+  grid-area: pages;
   padding: 0 20px;
 }
 </style>

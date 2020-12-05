@@ -1,8 +1,8 @@
 <template>
   <div class="messages" v-chat-scroll="{always: false}">
-    <div v-for="line in chat" :style="line | styleLine">
-      <span :title="line.time | moment('MMMM Do, Y')">
-        &lt;{{line.time | moment("HH:mm:ss")}}&gt;
+    <div v-for="line in chat" :style="styleLine(line)">
+      <span :title="$moment(line.time, 'MMMM Do, Y')">
+        &lt;{{$moment(line.time, "HH:mm:ss")}}&gt;
       </span>
       {{prefix(line)}}{{line.name}}[{{line.level}}]:
       <span class="message" v-html="render(line.message, line.admin||line.mod)"></span>
@@ -17,6 +17,7 @@ export default {
   name: 'chatlist',
   props: ['chat'],
   methods: {
+    render,
     prefix: (line) => {
       let r = ''
       if (line.hardcore) r += '[H]'
@@ -24,9 +25,6 @@ export default {
       if (line.mod) r += '<MOD>'
       return r
     },
-    render
-  },
-  filters: {
     styleLine: (line) => {
       return {
         color: line.level >= 100 ? 'black' : line.color,
@@ -42,6 +40,7 @@ export default {
 .messages {
   flex: auto;
   overflow-y: scroll;
+  word-break: break-word;
 }
 </style>
 

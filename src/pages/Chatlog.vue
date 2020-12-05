@@ -7,19 +7,19 @@
       <input type="button" value="<" @click.prevent="page--" />
       <input type="number" v-model.lazy.trim.number="page" />
       <span>/</span>
-      <span class="wide">{{lastPage | commaify}}</span>
+      <span class="wide">{{$commaify(lastPage)}}</span>
       <input type="button" value=">" @click.prevent="page++" />
       <input type="button" value=">>" @click.prevent="page+=5" />
       <input type="button" value=">>>" @click.prevent="page+=25" />
         <input type="button" value=">❘" @click.prevent="page=lastPage" />
     </div>
-    <chatlist :chat="chat"></chatlist>
+    <chatlist ref="chatlist" :chat="chat"></chatlist>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import chatlist from '../components/chatlist'
+import chatlist from '../components/chatlist.vue'
 
 export default {
   name: 'chatlog',
@@ -43,7 +43,7 @@ export default {
     page: function () {
       if (this.page < 1) this.page = 1
       if (this.lastPage && this.page > this.lastPage) this.page = this.lastPage
-      this.send('chatlog', {page: this.page}).then((data) => {
+      this.send('chatlog', {page: +this.page}).then((data) => {
         if (data.error) {
           console.error(data.error)
           return
@@ -51,7 +51,7 @@ export default {
 
         this.chat = data.chat
         this.lastPage = data.pages
-        this.$children[0].$el.scrollTop = 0
+        this.$refs.chatlist.scrollTop = 0
       })
     }
   }

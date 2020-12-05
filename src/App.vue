@@ -2,7 +2,8 @@
   <div class="app">
     <div class="main" @click="click">
       <top />
-      <middle />
+      <user />
+      <pages />
       <bottom />
     </div>
     <div class="modal" v-if="error">
@@ -18,25 +19,21 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 
-import Top from './Top'
-import Middle from './Middle'
-import Bottom from './Bottom'
+import Top from './Top.vue'
+import User from './User.vue'
+import Pages from './Pages.vue'
+import Bottom from './Bottom.vue'
 
 export default {
   name: 'app',
   components: {
     Top,
-    Middle,
+    User,
+    Pages,
     Bottom
   },
-  head: {
-    title: function () {
-      return {
-        inner: `CLICKQUEST V${this.MAJOR}.${this.MINOR}.${this.PATCH}:${this.REVISION}`,
-        separator: ' ',
-        complement: ' '
-      }
-    }
+  mounted() {
+    document.title = `CLICKQUEST V${this.MAJOR}.${this.MINOR}.${this.PATCH}:${this.REVISION}`
   },
   computed: mapState([
     'MAJOR',
@@ -61,23 +58,26 @@ export default {
 	font-style: normal;
 }
 
-html, body, .app {
+html, body, .app, .main {
   margin: 0;
   padding: 0;
   height: 100%;
 }
 
 .app {
-  display: flex;
   font-family: "DOS", "Courier", sans-serif;
   background: black;
   color: white;
 }
 
 .main {
-  display: flex;
-  flex: auto;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: min-content minmax(0, auto) min-content;
+  grid-template-columns: 50% 50%;
+  grid-template-areas:
+    "top    top"
+    "user   pages"
+    "bottom bottom";
 }
 
 @media(max-width: 1500px) { .app { font-size: 0.95em; } }
